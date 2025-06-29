@@ -7,11 +7,6 @@ pipeline {
   }
 
   stages {
-    stage('Clone Repo') {
-      steps {
-        git 'https://github.com/harshh1012/SPOTIFY_PLAYLIST.git'
-      }
-    }
 
     stage('Build Backend') {
       steps {
