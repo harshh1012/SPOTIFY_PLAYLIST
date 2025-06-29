@@ -1,29 +1,45 @@
 pipeline {
   agent any
 
+  environment {
+    BACKEND_IMAGE = "harshith1203/spotify-backend"
+    FRONTEND_IMAGE = "harshith1203/spotify-frontend"
+  }
+
   stages {
+    stage('Clone Repo') {
+      steps {
+        git 'https://github.com/harshh1012/SPOTIFY_PLAYLIST.git'
+      }
+    }
+
     stage('Build Backend') {
       steps {
-        sh 'docker build -t spotify-backend ./backend'
+        sh 'docker build -t $BACKEND_IMAGE ./backend'
       }
     }
+
     stage('Build Frontend') {
       steps {
-        sh 'docker build -t spotify-frontend ./frontend'
+        sh 'docker build -t $FRONTEND_IMAGE ./frontend'
       }
     }
-    stage('Push to Registry') {
+
+    stage('Push Images') {
       steps {
-        // add your Docker Hub login
-        sh 'docker tag spotify-backend yourhub/spotify-backend'
-        sh 'docker push yourhub/spotify-backend'
-        sh 'docker tag spotify-frontend yourhub/spotify-frontend'
-        sh 'docker push yourhub/spotify-frontend'
+        withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          sh """
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            docker push $BACKEND_IMAGE
+            docker push $FRONTEND_IMAGE
+          """
+        }
       }
     }
-    stage('Deploy with Kubernetes') {
+
+    stage('Deploy') {
       steps {
-        sh 'kubectl apply -f k8s'
+        sh 'echo "You could deploy to Kubernetes here"'
       }
     }
   }
