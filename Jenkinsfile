@@ -8,6 +8,12 @@ pipeline {
 
   stages {
 
+    stage('Checkout') {
+            steps {
+                git url: 'https://github.com/harshh1012/SPOTIFY_PLAYLIST.git', branch: 'main'
+            }
+        }
+        
     stage('Build Backend') {
       steps {
         sh 'docker build -t $BACKEND_IMAGE ./backend'
